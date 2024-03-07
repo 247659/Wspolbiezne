@@ -18,5 +18,12 @@ namespace TestProject1
 
             Assert.AreEqual(5, result);
         }
+        
+        [Test]
+        public void Test2()
+        {
+            int result = 3;
+            Assert.AreEqual(3, result);
+        }
     }
 }
