@@ -8,8 +8,16 @@
         Title="MainWindow" Height="450" Width="800">
     <Grid>
         <Label Content="Podaj ilość kul" HorizontalAlignment="Left" Height="30" Margin="359,10,0,0" VerticalAlignment="Top" Width="90" />
-        <TextBox HorizontalAlignment="Center" Height="30" Margin="0,40,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="82"/>
-        <Rectangle HorizontalAlignment="Center" Height="300" Margin="0,85,0,0" Stroke="Black" VerticalAlignment="Top" Width="700"/>
+        <TextBox HorizontalAlignment="Center" Height="30" Margin="0,40,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="80" Text="{Binding BallsNumber}"/>
+        <Border BorderBrush="Black" BorderThickness="4" HorizontalAlignment="Center" Height="300" Margin="0,90,0,0" VerticalAlignment="Top" Width="600">
+            <ItemsControl ItemsSource="{Binding Balls}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Ellipse Width="20" Height="20" Fill="Red" Canvas.Left="{Binding PosX}" Canvas.Top="{Binding PosY}"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Border>
 
     </Grid>
 </Window>
