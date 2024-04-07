@@ -8,11 +8,11 @@ namespace Model
     {
         private double _posX;
         private double _posY;
-        private double velocity;
+        //private double velocity;
 
         public double PosX
         {
-            get { return PosX; }
+            get { return _posX; }
             set
             {
                 _posX = value;
@@ -22,7 +22,7 @@ namespace Model
 
         public double PosY
         {
-            get { return PosY; }
+            get { return _posY; }
             set
             {
                 _posY = value;
