@@ -30,7 +30,5 @@
             </ItemsControl>
         </Border>
         <Button Content="Zatwierdź" HorizontalAlignment="Left" Margin="418,40,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.816,-0.467" Command="{Binding CreateBallCommand}" Width="68" Height="25"/>
-        <Canvas x:Name="canvas">
-        </Canvas>
     </Grid>
 </Window>

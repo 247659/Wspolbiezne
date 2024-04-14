@@ -8,7 +8,9 @@ namespace Model
     {
         private double _posX;
         private double _posY;
-        //private double velocity;
+        private double _a;
+        private double _b;
+        private int _direction;
 
         public double PosX
         {
@@ -30,6 +32,32 @@ namespace Model
             }
         }
 
+        public double A
+        {
+            get { return _a; }
+            set
+            {
+                _a = value;
+            }
+        }
+
+        public double B
+        {
+            get { return _b; }
+            set
+            {
+                _b = value;
+            }
+        }
+
+        public int Direction
+        {
+            get { return _direction; }
+            set
+            {
+                _direction = value;
+            }
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
 

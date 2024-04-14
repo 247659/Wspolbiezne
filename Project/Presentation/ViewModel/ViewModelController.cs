@@ -1,8 +1,8 @@
-﻿using Model;
+﻿using Logic;
+using Model;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 
@@ -12,6 +12,7 @@ namespace ViewModel
     {
         private string _ballsNumber;
         private ObservableCollection<BallModel> _balls;
+        private BallLogic _ballLogic;
 
         public ICommand CreateBallCommand { get; set; }
 
@@ -36,7 +37,7 @@ namespace ViewModel
                 ball.PosY = random.Next(0, (int)(maxHeight - 20)); // Wysokość piłki musi być uwzględniona
                 Balls.Add(ball); // Dodaje piłkę do kolekcji
             }
-          
+            _ballLogic = new BallLogic(_balls, 600, 300);
         }
 
         public string BallsNumber
