@@ -10,15 +10,26 @@
         <Label Content="Podaj ilość kul" HorizontalAlignment="Left" Height="30" Margin="359,10,0,0" VerticalAlignment="Top" Width="90" />
         <TextBox HorizontalAlignment="Left" Height="25" Margin="320,40,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="80" Text="{Binding BallsNumber}"/>
         <Border BorderBrush="Black" BorderThickness="4" HorizontalAlignment="Center" Height="300" Margin="0,90,0,0" VerticalAlignment="Top" Width="600">
-            <ItemsControl>
+            <ItemsControl ItemsSource="{Binding Balls}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Canvas/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemContainerStyle>
+                    <Style>
+                        <Setter Property="Canvas.Left" Value="{Binding PosX}"/>
+                        <Setter Property="Canvas.Top" Value="{Binding PosY}"/>
+                    </Style>
+                </ItemsControl.ItemContainerStyle>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Ellipse Width="20" Height="20" Fill="Red" Canvas.Left="{Binding PosX}" Canvas.Top="{Binding PosY}"/>
+                        <Ellipse Width="20" Height="20" Fill="Red"/>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </Border>
-        <Button Content="Zatwierdź" HorizontalAlignment="Left" Margin="418,40,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.816,-0.467" Click="Button_Click" Width="68" Height="25"/>
+        <Button Content="Zatwierdź" HorizontalAlignment="Left" Margin="418,40,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.816,-0.467" Command="{Binding CreateBallCommand}" Width="68" Height="25"/>
         <Canvas x:Name="canvas">
         </Canvas>
     </Grid>

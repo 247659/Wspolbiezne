@@ -23,36 +23,5 @@ namespace View
             InitializeComponent();
             DataContext = new VievModelController();
         }
-        
-        private void GenerateBalls(int numberOfBalls)
-        {
-            canvas.Children.Clear();
-            Random random = new Random();
-            for (int i = 0; i < numberOfBalls; i++)
-            {
-                Ellipse ball = new Ellipse();
-                ball.Width = 20;
-                ball.Height = 20;
-                ball.Fill = Brushes.Red;
-                int randomX = random.Next(96, 670);
-                int randomY = random.Next(90, 370);
-
-                // Losujemy pozycję kulki na płótnie
-                double left = randomX;
-                double top = randomY;
-
-                Canvas.SetLeft(ball, left);
-                Canvas.SetTop(ball, top);
-
-                canvas.Children.Add(ball);
-            }
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            VievModelController viewModel = (VievModelController)DataContext;
-            String balls = viewModel.BallsNumber;
-            GenerateBalls(Int32.Parse(balls));
-        }
     }
 }
