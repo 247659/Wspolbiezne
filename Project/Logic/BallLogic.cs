@@ -43,7 +43,7 @@ namespace Logic
                 // Oblicz nowe pozycje piłki na podstawie funkcji liniowej
                 double newX = ball.PosX + ball.Direction; // Zwiększamy pozycję X o 1 w każdym kroku
                 double newY = ball.A * newX + ball.B;
-
+                
                 // Sprawdź, czy nowa pozycja piłki jest w obrębie Border
                 if (newX >= 0 && newX <= _maxWidth && newY >= 0 && newY <= _maxHeight)
                 {
@@ -54,7 +54,12 @@ namespace Logic
                 }
                 else
                 {
-                    ball.Direction = -ball.Direction;
+                    if (newX < 0 || newX > _maxWidth)
+                    {
+                        ball.Direction = -ball.Direction;
+                    }
+                    ball.A = -ball.A;
+                    ball.B = ball.PosY - (ball.A * ball.PosX);
                 }
             }
            
