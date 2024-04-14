@@ -21,7 +21,7 @@ namespace Logic
             _random = new Random();
 
             GenerateDirection();
-            _timer = new Timer(MoveBalls, null, 0, 100);
+            _timer = new Timer(MoveBalls, null, 0, 10);
         }
 
         private void GenerateDirection()
@@ -34,7 +34,6 @@ namespace Logic
                 ball.Direction = rand == 0 ? -1 : 1;
             }
         }
-       
 
         private void MoveBalls(object state)
         {
@@ -51,6 +50,11 @@ namespace Logic
                     // Jeśli nowa pozycja jest w obrębie Border, ustaw ją jako nową pozycję piłki
                     ball.PosX = newX;
                     ball.PosY = newY;
+
+                }
+                else
+                {
+                    ball.Direction = -ball.Direction;
                 }
             }
            

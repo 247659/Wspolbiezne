@@ -37,7 +37,7 @@ namespace ViewModel
                 ball.PosY = random.Next(0, (int)(maxHeight - 20)); // Wysokość piłki musi być uwzględniona
                 Balls.Add(ball); // Dodaje piłkę do kolekcji
             }
-            _ballLogic = new BallLogic(_balls, 600, 300);
+            _ballLogic = new BallLogic(_balls, 572, 272);
         }
 
         public string BallsNumber
