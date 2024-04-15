@@ -12,7 +12,8 @@ namespace ViewModel
     {
         private string _ballsNumber;
         private ObservableCollection<BallModel> _balls;
-        private BallLogic _ballLogic;
+        private BallLogic _ballLogic = new BallLogic();
+        private BallModel model;
 
         public ICommand CreateBallCommand { get; set; }
 
@@ -20,29 +21,14 @@ namespace ViewModel
         {
             BallsNumber = "0";
             CreateBallCommand = new RelayCommand(CreateBalls);
-            Balls = new ObservableCollection<BallModel>();
         }
 
         private void CreateBalls(object obj)
         {
-            if (_ballLogic != null)
-            {
-                _ballLogic.StopTimer();
-            }
-
-            Balls.Clear();
-            int numberOfBalls = Convert.ToInt32(BallsNumber);
-            Random random = new Random();
-            double maxWidth = 600; // Szerokość Border
-            double maxHeight = 300; // Wysokość Border
-            for (int i = 0; i < numberOfBalls; i++)
-            {
-                BallModel ball = new BallModel();
-                ball.PosX = random.Next(0, (int)(maxWidth - 28)); // Szerokość piłki musi być uwzględniona
-                ball.PosY = random.Next(0, (int)(maxHeight - 28)); // Wysokość piłki musi być uwzględniona
-                Balls.Add(ball); // Dodaje piłkę do kolekcji
-            }
-            _ballLogic = new BallLogic(_balls, 572, 272);
+            _ballLogic.CreateBalls(_ballsNumber);
+            model = _ballLogic.Model;
+            Balls = model.Balls;
+            Console.WriteLine(_balls.Count);
         }
 
         public string BallsNumber

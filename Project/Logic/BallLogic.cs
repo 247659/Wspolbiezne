@@ -10,22 +10,18 @@ namespace Logic
 {
     public class BallLogic
     {
-        private readonly ObservableCollection<BallModel> _balls;
-        private readonly double _maxWidth;
-        private readonly double _maxHeight;
-        private readonly Random _random;
+        private ObservableCollection<BallData> _balls;
+        private ObservableCollection<BallModel> _ballsModel;
+        private double _maxWidth;
+        private double _maxHeight;
+        private readonly Random _random = new Random();
         private Timer _timer;
+        private BallModel _model = new BallModel();
 
-        public BallLogic(ObservableCollection<BallModel> balls, double maxWidth, double maxHeight)
+        public BallLogic()
         {
-            _balls = balls;
-            _maxWidth = maxWidth;
-            _maxHeight = maxHeight;
-            _random = new Random();
-
-            GenerateDirection();
-            _timer = new Timer(MoveBalls, null, 0, 10);
-            
+            Balls = new ObservableCollection<BallData>();
+            _ballsModel = new ObservableCollection<BallModel>();
         }
         
         public void StopTimer()
@@ -35,7 +31,7 @@ namespace Logic
 
         private void GenerateDirection()
         {
-            foreach (BallModel ball in _balls)
+            foreach (BallData ball in _balls)
             {
                 ball.A = _random.NextDouble() * 2 - 1;
                 ball.B = ball.PosY - (ball.A * ball.PosX);
@@ -47,9 +43,10 @@ namespace Logic
         private void MoveBalls(object state)
         {
             
-            var ballsCopy = new List<BallModel>(_balls);
+            var ballsCopy = new List<BallData>(_balls);
+            int counter = 0;
 
-            foreach (BallModel ball in ballsCopy)
+            foreach (BallData ball in ballsCopy)
             {
                 double newX = ball.PosX + ball.Direction * 4; // Increment X position by 1 in each step
                 double newY = ball.A * newX + ball.B;
@@ -58,6 +55,7 @@ namespace Logic
                 {
                     ball.PosX = newX;
                     ball.PosY = newY;
+                    Model.UpdateBall(newX, newY, counter);
                 }
                 else
                 {
@@ -68,8 +66,55 @@ namespace Logic
                     ball.A = -ball.A;
                     ball.B = ball.PosY - (ball.A * ball.PosX);
                 }
+
+                counter++;
             }
            
         }
+
+        public void CreateBalls(string ballNumber)
+        {
+            
+            if (_timer != null)
+            {
+                StopTimer();
+            }
+            
+            Balls.Clear();
+            Model.Clear();
+            
+            int numberOfBalls = Convert.ToInt32(ballNumber);
+            _maxWidth = 572; // Szerokość Border
+            _maxHeight = 272; // Wysokość Border
+            for (int i = 0; i < numberOfBalls; i++)
+            {
+                BallData ball = new BallData();
+                ball.PosX = _random.Next(0, (int)(_maxWidth)); // Szerokość piłki musi być uwzględniona
+                ball.PosY = _random.Next(0, (int)(_maxHeight)); // Wysokość piłki musi być uwzględniona
+                Balls.Add(ball); // Dodaje piłkę do kolekcj
+                Model.AddBall(ball.PosX, ball.PosY);
+            }
+            GenerateDirection();
+            _timer = new Timer(MoveBalls, null, 0, 10);
+        }
+        
+        public ObservableCollection<BallData> Balls
+        {
+            get { return _balls; }
+            set
+            {
+                _balls = value;
+            }
+        }
+        
+        public BallModel Model
+        {
+            get { return _model; }
+            set
+            {
+                _model = value;
+            }
+        }
+        
     }
 }
