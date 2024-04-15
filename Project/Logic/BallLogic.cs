@@ -1,7 +1,10 @@
 ﻿using Model;
+using Data;
 using System.Collections.ObjectModel;
 using System;
 using System.Threading;
+using System.Collections.Generic;
+
 
 namespace Logic
 {
@@ -22,6 +25,12 @@ namespace Logic
 
             GenerateDirection();
             _timer = new Timer(MoveBalls, null, 0, 10);
+            
+        }
+        
+        public void StopTimer()
+        {
+            _timer.Dispose();
         }
 
         private void GenerateDirection()
@@ -38,19 +47,17 @@ namespace Logic
         private void MoveBalls(object state)
         {
             
-            foreach (BallModel ball in _balls)
+            var ballsCopy = new List<BallModel>(_balls);
+
+            foreach (BallModel ball in ballsCopy)
             {
-                // Oblicz nowe pozycje piłki na podstawie funkcji liniowej
-                double newX = ball.PosX + ball.Direction; // Zwiększamy pozycję X o 1 w każdym kroku
+                double newX = ball.PosX + ball.Direction * 4; // Increment X position by 1 in each step
                 double newY = ball.A * newX + ball.B;
-                
-                // Sprawdź, czy nowa pozycja piłki jest w obrębie Border
+
                 if (newX >= 0 && newX <= _maxWidth && newY >= 0 && newY <= _maxHeight)
                 {
-                    // Jeśli nowa pozycja jest w obrębie Border, ustaw ją jako nową pozycję piłki
                     ball.PosX = newX;
                     ball.PosY = newY;
-
                 }
                 else
                 {

@@ -25,6 +25,11 @@ namespace ViewModel
 
         private void CreateBalls(object obj)
         {
+            if (_ballLogic != null)
+            {
+                _ballLogic.StopTimer();
+            }
+
             Balls.Clear();
             int numberOfBalls = Convert.ToInt32(BallsNumber);
             Random random = new Random();
@@ -33,8 +38,8 @@ namespace ViewModel
             for (int i = 0; i < numberOfBalls; i++)
             {
                 BallModel ball = new BallModel();
-                ball.PosX = random.Next(0, (int)(maxWidth - 20)); // Szerokość piłki musi być uwzględniona
-                ball.PosY = random.Next(0, (int)(maxHeight - 20)); // Wysokość piłki musi być uwzględniona
+                ball.PosX = random.Next(0, (int)(maxWidth - 28)); // Szerokość piłki musi być uwzględniona
+                ball.PosY = random.Next(0, (int)(maxHeight - 28)); // Wysokość piłki musi być uwzględniona
                 Balls.Add(ball); // Dodaje piłkę do kolekcji
             }
             _ballLogic = new BallLogic(_balls, 572, 272);
