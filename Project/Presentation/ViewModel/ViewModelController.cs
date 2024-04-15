@@ -28,7 +28,6 @@ namespace ViewModel
             _ballLogic.CreateBalls(_ballsNumber);
             model = _ballLogic.Model;
             Balls = model.Balls;
-            Console.WriteLine(_balls.Count);
         }
 
         public string BallsNumber

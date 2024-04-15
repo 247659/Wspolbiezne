@@ -1,32 +1,14 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 
 namespace Data
 {
     public class BallData
     {
-        private double _posX;
-        private double _posY;
         private double _a;
         private double _b;
         private int _direction;
-
-        public double PosX
-        {
-            get { return _posX; }
-            set
-            {
-                _posX = value;
-            }
-        }
-
-        public double PosY
-        {
-            get { return _posY; }
-            set
-            {
-                _posY = value;
-            }
-        }
+        private ObservableCollection<BallData> _balls = new ObservableCollection<BallData>();
 
         public double A
         {
@@ -52,6 +34,15 @@ namespace Data
             set
             {
                 _direction = value;
+            }
+        }
+        
+        public ObservableCollection<BallData> Balls
+        {
+            get { return _balls; }
+            set
+            {
+                _balls = value;
             }
         }
     }
