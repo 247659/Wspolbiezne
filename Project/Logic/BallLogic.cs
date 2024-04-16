@@ -1,6 +1,5 @@
 ﻿using Model;
 using Data;
-using System.Collections.ObjectModel;
 using System;
 using System.Threading;
 using System.Collections.Generic;
@@ -47,7 +46,7 @@ namespace Logic
 
             foreach (BallData ball in ballsCopy)
             {
-                double newX = ballsModelCopy[counter].PosX + ball.Direction * 4; // Increment X position by 1 in each step
+                double newX = ballsModelCopy[counter].PosX + ball.Direction * 4;
                 double newY = ball.A * newX + ball.B;
 
                 if (newX >= 0 && newX <= _maxWidth && newY >= 0 && newY <= _maxHeight)
@@ -86,8 +85,8 @@ namespace Logic
             {
                 BallModel ball = new BallModel();
                 BallData ballData = new BallData();
-                ball.PosX = _random.Next(0, (int)(_maxWidth)); // Szerokość piłki musi być uwzględniona
-                ball.PosY = _random.Next(0, (int)(_maxHeight)); // Wysokość piłki musi być uwzględniona
+                ball.PosX = _random.Next(0, (int)(_maxWidth));
+                ball.PosY = _random.Next(0, (int)(_maxHeight)); 
                 RepoModel.Balls.Add(ball);
                 RepoData.Balls.Add(ballData);
             }
