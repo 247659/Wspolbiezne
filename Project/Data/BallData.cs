@@ -8,7 +8,6 @@ namespace Data
         public double A { get; set; }
         public double B { get; set; }
         public int Direction { get; set; }
-        ObservableCollection<BallData> Balls { get; set; }
     }
 
     public class BallData : IBallData
@@ -16,7 +15,6 @@ namespace Data
         private double _a;
         private double _b;
         private int _direction;
-        private ObservableCollection<BallData> _balls = new ObservableCollection<BallData>();
 
         public double A
         {
@@ -42,15 +40,6 @@ namespace Data
             set
             {
                 _direction = value;
-            }
-        }
-        
-        public ObservableCollection<BallData> Balls
-        {
-            get { return _balls; }
-            set
-            {
-                _balls = value;
             }
         }
     }

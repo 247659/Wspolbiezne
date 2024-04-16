@@ -10,63 +10,49 @@ namespace Logic
 {
     public interface IBallLogic
     {
-        public void StopTimer();
         public void CreateBalls(string number);
-        BallModel Model { get; set; }
-        BallData Data { get; set; }
+        DataRepo RepoData { get; set; }
+        ModelRepo RepoModel { get; set; }
     }
 
     public class BallLogic : IBallLogic
     {
-        private ObservableCollection<BallData> Balls;
-        private ObservableCollection<BallModel> BallsModel;
         private double _maxWidth = 572;
         private double _maxHeight = 272;
         private readonly Random _random = new Random();
         private Timer _timer;
-        private BallModel _model = new BallModel();
-        private BallData _data = new BallData();
-        private int ballsNumber;
-
-        public BallLogic() {}
-        
-        public void StopTimer()
-        {
-            _timer.Dispose();
-        }
+        private ModelRepo _repoModel = new ModelRepo();
+        private DataRepo _repoData = new DataRepo();
 
         private void GenerateDirection()
         {
-            Balls = Data.Balls;
-            BallsModel = Model.Balls;
             int counter = 0;
-            foreach (BallData ball in Balls)
+            foreach (BallData ball in RepoData.Balls)
             {
                 ball.A = _random.NextDouble() * 2 - 1;
-                ball.B = BallsModel[counter].PosY - (ball.A * BallsModel[counter].PosX);
+                ball.B = RepoModel.Balls[counter].PosY - (ball.A * RepoModel.Balls[counter].PosX);
                 int rand = _random.Next(0, 2);
                 ball.Direction = rand == 0 ? -1 : 1;
                 counter++;
             }
-            Data.Balls = Balls;
         }
 
         private void MoveBalls(object state)
         {
-            
-            Balls = Data.Balls;
-            BallsModel = Model.Balls;
             int counter = 0;
 
-            foreach (BallData ball in Balls)
+            var ballsCopy = new List<BallData>(RepoData.Balls);
+            var ballsModelCopy = new List<BallModel>(RepoModel.Balls);
+
+            foreach (BallData ball in ballsCopy)
             {
-                double newX = BallsModel[counter].PosX + ball.Direction * 4; // Increment X position by 1 in each step
+                double newX = ballsModelCopy[counter].PosX + ball.Direction * 4; // Increment X position by 1 in each step
                 double newY = ball.A * newX + ball.B;
 
                 if (newX >= 0 && newX <= _maxWidth && newY >= 0 && newY <= _maxHeight)
                 {
-                    BallsModel[counter].PosX = newX;
-                    BallsModel[counter].PosY = newY;
+                    ballsModelCopy[counter].PosX = newX;
+                    ballsModelCopy[counter].PosY = newY;
                 }
                 else
                 {
@@ -75,13 +61,11 @@ namespace Logic
                         ball.Direction = -ball.Direction;
                     }
                     ball.A = -ball.A;
-                    ball.B = BallsModel[counter].PosY - (ball.A * BallsModel[counter].PosX);
+                    ball.B = ballsModelCopy[counter].PosY - (ball.A * ballsModelCopy[counter].PosX);
                 }
                 
                 counter++;
             }
-            Model.Balls = BallsModel;
-            Data.Balls = Balls;
         }
 
         public void CreateBalls(string ballNumber)
@@ -89,16 +73,12 @@ namespace Logic
             
             if (_timer != null)
             {
-                StopTimer();
+                _timer.Dispose();
             }
-
-            Balls = Data.Balls;
-            BallsModel = Model.Balls;
+            RepoData.Balls.Clear();
+            RepoModel.Balls.Clear();
             
-            Balls.Clear();
-            BallsModel.Clear();
-            
-            ballsNumber = Convert.ToInt32(ballNumber);
+            int ballsNumber = Convert.ToInt32(ballNumber);
             
             for (int i = 0; i < ballsNumber; i++)
             {
@@ -106,34 +86,32 @@ namespace Logic
                 BallData ballData = new BallData();
                 ball.PosX = _random.Next(0, (int)(_maxWidth)); // Szerokość piłki musi być uwzględniona
                 ball.PosY = _random.Next(0, (int)(_maxHeight)); // Wysokość piłki musi być uwzględniona
-                BallsModel.Add(ball);
-                Balls.Add(ballData);
+                RepoModel.Balls.Add(ball);
+                RepoData.Balls.Add(ballData);
             }
 
-            Model.Balls = BallsModel;
-            Data.Balls = Balls;
             GenerateDirection();
             _timer = new Timer(MoveBalls, null, 0, 10);
         }
         
         
-        public BallModel Model
+        public ModelRepo RepoModel
         {
-            get { return _model; }
+            get { return _repoModel; }
             set
             {
-                _model = value;
+                _repoModel = value;
             }
         }
-        
-        public BallData Data
+
+        public DataRepo RepoData
         {
-            get { return _data; }
+            get { return _repoData; }
             set
             {
-                _data = value;
+                _repoData = value;
             }
         }
-        
+
     }
 }

@@ -8,16 +8,16 @@ using System.Windows.Input;
 
 namespace ViewModel
 {
-    public class VievModelController : INotifyPropertyChanged
+    public class ViewModelController : INotifyPropertyChanged
     {
         private string _ballsNumber;
         private ObservableCollection<BallModel> _balls;
         private BallLogic _ballLogic = new BallLogic();
-        private BallModel model;
+        private ModelRepo _repo;
 
         public ICommand CreateBallCommand { get; set; }
 
-        public VievModelController()
+        public ViewModelController()
         {
             BallsNumber = "0";
             CreateBallCommand = new RelayCommand(CreateBalls);
@@ -26,8 +26,8 @@ namespace ViewModel
         private void CreateBalls(object obj)
         {
             _ballLogic.CreateBalls(_ballsNumber);
-            model = _ballLogic.Model;
-            Balls = model.Balls;
+            _repo = _ballLogic.RepoModel;
+            Balls = _repo.Balls;
         }
 
         public string BallsNumber
@@ -52,7 +52,7 @@ namespace ViewModel
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        private void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
