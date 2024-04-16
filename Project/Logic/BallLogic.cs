@@ -10,7 +10,7 @@ namespace Logic
 {
     public interface IBallLogic
     {
-        public void CreateBalls(string number);
+        public void CreateBalls();
         DataRepo RepoData { get; set; }
         ModelRepo RepoModel { get; set; }
     }
@@ -23,6 +23,7 @@ namespace Logic
         private Timer _timer;
         private ModelRepo _repoModel = new ModelRepo();
         private DataRepo _repoData = new DataRepo();
+
 
         private void GenerateDirection()
         {
@@ -68,17 +69,18 @@ namespace Logic
             }
         }
 
-        public void CreateBalls(string ballNumber)
+        public void CreateBalls()
         {
             
             if (_timer != null)
             {
                 _timer.Dispose();
             }
+
             RepoData.Balls.Clear();
             RepoModel.Balls.Clear();
             
-            int ballsNumber = Convert.ToInt32(ballNumber);
+            int ballsNumber = Convert.ToInt32(RepoModel.BallsNumber);
             
             for (int i = 0; i < ballsNumber; i++)
             {

@@ -10,6 +10,7 @@ namespace Model
     public class ModelRepo : INotifyPropertyChanged
     {
         private ObservableCollection<BallModel> _balls = new ObservableCollection<BallModel>();
+        private string _ballsNumber;
 
         public ObservableCollection<BallModel> Balls
         {
@@ -17,6 +18,16 @@ namespace Model
             set
             {
                 _balls = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string BallsNumber
+        {
+            get { return _ballsNumber; }
+            set
+            {
+                _ballsNumber = value;
                 OnPropertyChanged();
             }
         }

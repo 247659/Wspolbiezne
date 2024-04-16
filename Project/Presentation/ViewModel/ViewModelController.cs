@@ -10,7 +10,6 @@ namespace ViewModel
 {
     public class ViewModelController : INotifyPropertyChanged
     {
-        private string _ballsNumber;
         private BallLogic _ballLogic = new BallLogic();
         private ModelRepo _repo;
 
@@ -18,24 +17,14 @@ namespace ViewModel
 
         public ViewModelController()
         {
-            BallsNumber = "0";
             CreateBallCommand = new RelayCommand(CreateBalls);
+            Repo = _ballLogic.RepoModel;
+            Repo.BallsNumber = "0";
         }
 
         private void CreateBalls(object obj)
         {
-            _ballLogic.CreateBalls(_ballsNumber);
-            Repo = _ballLogic.RepoModel;
-        }
-
-        public string BallsNumber
-        {
-            get { return _ballsNumber; }
-            set
-            {
-                _ballsNumber = value;
-                OnPropertyChanged();
-            }
+            _ballLogic.CreateBalls();
         }
 
         public ModelRepo Repo

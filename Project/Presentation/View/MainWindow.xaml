@@ -8,7 +8,7 @@
         Title="MainWindow" Height="450" Width="800">
     <Grid>
         <Label Content="Podaj ilość kul" HorizontalAlignment="Left" Height="30" Margin="359,10,0,0" VerticalAlignment="Top" Width="90" />
-        <TextBox HorizontalAlignment="Left" Height="25" Margin="320,40,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="80" Text="{Binding BallsNumber}"/>
+        <TextBox HorizontalAlignment="Left" Height="25" Margin="320,40,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="80" Text="{Binding Repo.BallsNumber}"/>
         <Border BorderBrush="Black" BorderThickness="4" HorizontalAlignment="Center" Height="300" Margin="0,90,0,0" VerticalAlignment="Top" Width="600">
             <ItemsControl ItemsSource="{Binding Repo.Balls}">
                 <ItemsControl.ItemsPanel>
