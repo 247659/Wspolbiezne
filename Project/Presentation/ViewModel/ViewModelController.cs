@@ -11,7 +11,6 @@ namespace ViewModel
     public class ViewModelController : INotifyPropertyChanged
     {
         private string _ballsNumber;
-        private ObservableCollection<BallModel> _balls;
         private BallLogic _ballLogic = new BallLogic();
         private ModelRepo _repo;
 
@@ -26,8 +25,7 @@ namespace ViewModel
         private void CreateBalls(object obj)
         {
             _ballLogic.CreateBalls(_ballsNumber);
-            _repo = _ballLogic.RepoModel;
-            Balls = _repo.Balls;
+            Repo = _ballLogic.RepoModel;
         }
 
         public string BallsNumber
@@ -40,12 +38,12 @@ namespace ViewModel
             }
         }
 
-        public ObservableCollection<BallModel> Balls
+        public ModelRepo Repo
         {
-            get { return _balls; }
+            get { return _repo; }
             set
             {
-                _balls = value;
+                _repo = value;
                 OnPropertyChanged();
             }
         }
