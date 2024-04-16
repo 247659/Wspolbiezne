@@ -3,6 +3,14 @@ using System.Collections.ObjectModel;
 
 namespace Data
 {
+    public interface IBallData
+    {
+        public double A { get; set; }
+        public double B { get; set; }
+        public int Direction { get; set; }
+        ObservableCollection<BallData> Balls { get; set; }
+    }
+
     public class BallData
     {
         private double _a;

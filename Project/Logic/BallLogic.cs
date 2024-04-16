@@ -8,7 +8,15 @@ using System.Collections.Generic;
 
 namespace Logic
 {
-    public class BallLogic
+    public interface IBallLogic
+    {
+        public void StopTimer();
+        public void CreateBalls(string number);
+        BallModel Model { get; set; }
+        BallData Data { get; set; }
+    }
+
+    public class BallLogic : IBallLogic
     {
         private ObservableCollection<BallData> Balls;
         private ObservableCollection<BallModel> BallsModel;
