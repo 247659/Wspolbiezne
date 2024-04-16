@@ -8,7 +8,7 @@ namespace Testing
         [Test]
         public void GetDataTest()
         {
-            var ball = new BallData();
+            IBallData ball = new BallData();
             ball.A = 0.5;
             ball.Direction = 1;
             ball.B = 12;

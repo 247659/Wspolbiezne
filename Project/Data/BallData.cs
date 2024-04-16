@@ -11,7 +11,7 @@ namespace Data
         ObservableCollection<BallData> Balls { get; set; }
     }
 
-    public class BallData
+    public class BallData : IBallData
     {
         private double _a;
         private double _b;
