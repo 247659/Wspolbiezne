@@ -3,6 +3,7 @@ using Data;
 using System;
 using System.Threading;
 using System.Collections.Generic;
+using System.Diagnostics.Tracing;
 
 
 namespace Logic
@@ -16,8 +17,8 @@ namespace Logic
 
     public class BallLogic : IBallLogic
     {
-        private double _maxWidth = 572;
-        private double _maxHeight = 272;
+        private double _maxWidth = 582;
+        private double _maxHeight = 282;
         private readonly Random _random = new Random();
         private Timer _timer;
         private ModelRepo _repoModel = new ModelRepo();
@@ -43,9 +44,11 @@ namespace Logic
             ballData.A = _random.NextDouble() * 2 - 1;
             ballData.B = ball.PosY - (ballData.A * ball.PosX);
             int rand = _random.Next(0, 2);
-            ballData.Direction = rand == 0 ? -1 : 1;
+            int direction = rand == 0 ? -1 : 1;
+            ballData.Weight = _random.Next(1, 4);
+            ballData.Velocity = (_random.NextDouble() + 2) * direction;
         }
-
+        /*
         private void MoveBalls(object state)
         {
             int counter = 0;
@@ -76,34 +79,60 @@ namespace Logic
                 counter++;
             }
         }
+        */
 
         private void MoveBall(object state1, object state2)
         {
             BallModel ball = (BallModel)state1;
             BallData ballData = (BallData)state2;
+
+            var ballsCopy = new List<BallData>(RepoData.Balls);
+            var ballsModelCopy = new List<BallModel>(RepoModel.Balls);
+
             while (true)
             {
                 double newX, newY;
 
                 lock (ball) // Blokuj dostęp do obiektu kuli podczas aktualizacji jej pozycji
                 {
-                    newX = ball.PosX + ballData.Direction * 4;
+                    int counter = 0;
+                    foreach (var otherBall in ballsCopy)
+                    {
+                        double distance = Math.Sqrt(Math.Pow((ballsModelCopy[counter].PosX - ball.PosX), 2)
+                            + Math.Pow((ballsModelCopy[counter].PosY - ball.PosY), 2));
+                        if (distance <= 20 && otherBall != ballData)
+                        {
+                            ballData.Velocity = (ballData.Velocity * (ballData.Weight - otherBall.Weight)
+                                + 2 * otherBall.Weight * otherBall.Velocity) / (ballData.Weight + otherBall.Weight);
+
+
+                            otherBall.Velocity = (otherBall.Velocity * (otherBall.Weight - ballData.Weight)
+                                + 2 * ballData.Weight * ballData.Velocity) / (ballData.Weight + otherBall.Weight);
+
+                        }
+
+                        counter++;
+
+                    }
+
+                    newX = ball.PosX + ballData.Velocity;
                     newY = ballData.A * newX + ballData.B;
 
-                    if (newX >= 0 && newX <= _maxWidth && newY >= 0 && newY <= _maxHeight)
+                    if (newX >= 10 && newX <= _maxWidth && newY >= 10 && newY <= _maxHeight)
                     {
                         ball.PosX = newX;
                         ball.PosY = newY;
                     }
                     else
                     {
-                        if (newX < 0 || newX > _maxWidth)
+                        if (newX < 10 || newX > _maxWidth)
                         {
-                            ballData.Direction = -ballData.Direction;
+                            ballData.Velocity = -ballData.Velocity;
                         }
                         ballData.A = -ballData.A;
                         ballData.B = ball.PosY - (ballData.A * ball.PosX);
                     }
+                
                 }
                 Thread.Sleep(10);
             }
@@ -126,8 +155,8 @@ namespace Logic
             {
                 BallModel ball = new BallModel();
                 BallData ballData = new BallData();
-                ball.PosX = _random.Next(0, (int)(_maxWidth));
-                ball.PosY = _random.Next(0, (int)(_maxHeight));
+                ball.PosX = _random.Next(10, (int)(_maxWidth));
+                ball.PosY = _random.Next(10, (int)(_maxHeight));
                 RepoModel.Balls.Add(ball);
                 RepoData.Balls.Add(ballData);
                 GenerateDirection(ball, ballData);
