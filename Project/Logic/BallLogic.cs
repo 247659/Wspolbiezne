@@ -3,8 +3,6 @@ using Data;
 using System;
 using System.Threading;
 using System.Collections.Generic;
-using System.Diagnostics.Tracing;
-
 
 namespace Logic
 {
@@ -23,25 +21,13 @@ namespace Logic
         private Timer _timer;
         private ModelRepo _repoModel = new ModelRepo();
         private DataRepo _repoData = new DataRepo();
-        /*
-        private void GenerateDirection()
-        {
-            int counter = 0;
-            foreach (BallData ball in RepoData.Balls)
-            {
-                ball.A = _random.NextDouble() * 2 - 1;
-                ball.B = RepoModel.Balls[counter].PosY - (ball.A * RepoModel.Balls[counter].PosX);
-                int rand = _random.Next(0, 2);
-                ball.Direction = rand == 0 ? -1 : 1;
-                counter++;
-            }
-        }
-        */
+       
         private void GenerateDirection(object obj1, object obj2)
         {
             BallModel ball = (BallModel)obj1;
             BallData ballData = (BallData)obj2;
-            ballData.A = _random.NextDouble() * 2 - 1;
+            double angle = _random.NextDouble() * Math.PI;
+            ballData.A = Math.Tan(angle);
             ballData.B = ball.PosY - (ballData.A * ball.PosX);
             int rand = _random.Next(0, 2);
             int direction = rand == 0 ? -1 : 1;
@@ -93,8 +79,7 @@ namespace Logic
             {
                 double newX, newY;
 
-                lock (ball) // Blokuj dostęp do obiektu kuli podczas aktualizacji jej pozycji
-                {
+                
                     int counter = 0;
                     foreach (var otherBall in ballsCopy)
                     {
@@ -110,7 +95,6 @@ namespace Logic
                                 + 2 * ballData.Weight * ballData.Velocity) / (ballData.Weight + otherBall.Weight);
 
                         }
-
                         counter++;
 
                     }
@@ -133,7 +117,6 @@ namespace Logic
                         ballData.B = ball.PosY - (ballData.A * ball.PosX);
                     }
                 
-                }
                 Thread.Sleep(10);
             }
         }
@@ -141,10 +124,12 @@ namespace Logic
         public void CreateBalls()
         {
             // Nw czy po kolejnym wywołaniu tej funkcji poprzednie wątki się kończą
+            /*
             if (_timer != null)
             {
                 _timer.Dispose();
             }
+            */
 
             RepoData.Balls.Clear();
             RepoModel.Balls.Clear();
