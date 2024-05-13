@@ -73,14 +73,15 @@ namespace Testing
         public void ChangeDirectionAtDimensionYTest()
         {
             IBallLogic ballLogic = new BallLogic();
-            ballLogic.RepoModel.BallsNumber = "5";
+            ballLogic.RepoModel.BallsNumber = "1";
             ballLogic.CreateBalls();
             ballLogic.RepoData.Balls[0].Direction = 1;
-            ballLogic.RepoData.Balls[0].A = 0.5;
+            ballLogic.RepoData.Balls[0].A = 2;
             ballLogic.RepoModel.Balls[0].PosY = 274;
+            ballLogic.RepoModel.Balls[0].PosX = 274;
             Thread.Sleep(10);
             Assert.That(ballLogic.RepoData.Balls[0].Direction, Is.EqualTo(1));
-            Assert.That(ballLogic.RepoData.Balls[0].A, Is.EqualTo(-0.5));
+            Assert.That(ballLogic.RepoData.Balls[0].A, Is.EqualTo(-2));
         }
     }
 }

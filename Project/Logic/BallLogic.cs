@@ -3,6 +3,7 @@ using Data;
 using System;
 using System.Threading;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 
 namespace Logic
 {
@@ -30,9 +31,12 @@ namespace Logic
             ballData.A = Math.Tan(angle);
             ballData.B = ball.PosY - (ballData.A * ball.PosX);
             int rand = _random.Next(0, 2);
-            int direction = rand == 0 ? -1 : 1;
-            ballData.Weight = _random.Next(1, 4);
-            ballData.Velocity = (_random.NextDouble() + 2) * direction;
+            int directionHorizontal = rand == 0 ? -1 : 1;
+            int directionVertical = rand == 0 ? -1 : 1; 
+            //ballData.Weight = _random.Next(1, 4);
+            ballData.Weight = 1;
+            ballData.VelocityX = (_random.NextDouble() + 2) * directionHorizontal;
+            ballData.VelocityY = (_random.NextDouble() + 2) * directionVertical;
         }
         /*
         private void MoveBalls(object state)
@@ -87,20 +91,37 @@ namespace Logic
                             + Math.Pow((ballsModelCopy[counter].PosY - ball.PosY), 2));
                         if (distance <= 20 && otherBall != ballData)
                         {
-                            ballData.Velocity = (ballData.Velocity * (ballData.Weight - otherBall.Weight)
-                                + 2 * otherBall.Weight * otherBall.Velocity) / (ballData.Weight + otherBall.Weight);
+                            double tempX = ballData.VelocityX;
+                            double tempY = ballData.VelocityY;
+                            ballData.VelocityX = otherBall.VelocityX;
+                            ballData.VelocityY = otherBall.VelocityY;
+
+                            otherBall.VelocityX = tempX;
+                            otherBall.VelocityY = tempY;
+
+                            //ballData.VelocityX = (ballData.VelocityX * (ballData.Weight - otherBall.Weight)
+                            // + 2 * otherBall.Weight * otherBall.VelocityX) / (ballData.Weight + otherBall.Weight);
+
+                            //ballData.VelocityY = (ballData.VelocityY * (ballData.Weight - otherBall.Weight)
+                            // + 2 * otherBall.Weight * otherBall.VelocityY) / (ballData.Weight + otherBall.Weight);
+
+                            //ballData.A = otherBall.A;
+                            //otherBall.A = a;
 
 
-                            otherBall.Velocity = (otherBall.Velocity * (otherBall.Weight - ballData.Weight)
-                                + 2 * ballData.Weight * ballData.Velocity) / (ballData.Weight + otherBall.Weight);
+
+                            //otherBall.VelocityX = (otherBall.VelocityX * (otherBall.Weight - ballData.Weight)
+                            //+ 2 * ballData.Weight * ballData.VelocityX) / (ballData.Weight + otherBall.Weight);
+                            //otherBall.VelocityY = (otherBall.VelocityY * (otherBall.Weight - ballData.Weight)
+                            // + 2 * ballData.Weight * ballData.VelocityY) / (ballData.Weight + otherBall.Weight);
 
                         }
                         counter++;
 
                     }
 
-                    newX = ball.PosX + ballData.Velocity;
-                    newY = ballData.A * newX + ballData.B;
+                    newX = ball.PosX + ballData.VelocityX;
+                    newY = ball.PosY + ballData.VelocityY;
 
                     if (newX >= 10 && newX <= _maxWidth && newY >= 10 && newY <= _maxHeight)
                     {
@@ -109,11 +130,12 @@ namespace Logic
                     }
                     else
                     {
+                        ballData.VelocityY = -ballData.VelocityY;
                         if (newX < 10 || newX > _maxWidth)
                         {
-                            ballData.Velocity = -ballData.Velocity;
+                            ballData.VelocityX = -ballData.VelocityX;
+                            ballData.VelocityY = -ballData.VelocityY;
                         }
-                        ballData.A = -ballData.A;
                         ballData.B = ball.PosY - (ballData.A * ball.PosX);
                     }
                 

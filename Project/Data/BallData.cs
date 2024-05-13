@@ -7,7 +7,8 @@ namespace Data
     {
         public double A { get; set; }
         public double B { get; set; }
-        public double Velocity { get; set; }
+        public double VelocityX { get; set; }
+        public double VelocityY { get; set; }
     }
 
     public class BallData : IBallData
@@ -15,7 +16,8 @@ namespace Data
         private double _a;
         private double _b;
         private double _weight;
-        private double _velocity;
+        private double _velocityX;
+        private double _velocityY;
 
         public double A
         {
@@ -44,12 +46,21 @@ namespace Data
             }
         }
 
-        public double Velocity
+        public double VelocityX
         {
-            get { return _velocity; }
+            get { return _velocityX; }
             set
             {
-                _velocity = value;
+                _velocityX = value;
+            }
+        }
+        
+        public double VelocityY
+        {
+            get { return _velocityY; }
+            set
+            {
+                _velocityY = value;
             }
         }
     }
