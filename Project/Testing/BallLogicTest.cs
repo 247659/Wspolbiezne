@@ -83,5 +83,25 @@ namespace Testing
             Assert.That(ballLogic.RepoData.Balls[0].VelocityX, Is.EqualTo(1));
             Assert.That(ballLogic.RepoData.Balls[0].VelocityY, Is.EqualTo(-20));
         }
+        [Test]
+        public void CollisionBetweenBallsTest()
+        {
+            IBallLogic ballLogic = new BallLogic();
+            ballLogic.RepoModel.BallsNumber = "2";
+            ballLogic.CreateBalls();
+            ballLogic.RepoModel.Balls[0].PosX = 300;
+            ballLogic.RepoModel.Balls[0].PosY = 100;
+            ballLogic.RepoData.Balls[0].VelocityX = 1;
+            ballLogic.RepoData.Balls[0].VelocityY = 0;
+            ballLogic.RepoData.Balls[0].Weight = 1;
+            ballLogic.RepoModel.Balls[1].PosX = 320;
+            ballLogic.RepoModel.Balls[1].PosY = 100;
+            ballLogic.RepoData.Balls[1].VelocityX = -2;
+            ballLogic.RepoData.Balls[1].VelocityY = 0;
+            ballLogic.RepoData.Balls[1].Weight = 1;
+            Thread.Sleep(100);
+            Assert.That(ballLogic.RepoData.Balls[0].VelocityX, Is.EqualTo(-2));
+            Assert.That(ballLogic.RepoData.Balls[1].VelocityX, Is.EqualTo(1));
+        }
     }
 }
