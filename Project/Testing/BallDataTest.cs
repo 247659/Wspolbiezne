@@ -9,13 +9,13 @@ namespace Testing
         public void GetDataTest()
         {
             IBallData ball = new BallData();
-            ball.A = 0.5;
-            ball.Direction = 1;
-            ball.B = 12;
+            ball.Weight = 0.5;
+            ball.VelocityX = 1;
+            ball.VelocityY = 2;
 
-            Assert.That(ball.A, Is.EqualTo(0.5));
-            Assert.That(ball.Direction, Is.EqualTo(1));
-            Assert.That(ball.B, Is.EqualTo(12));
+            Assert.That(ball.Weight, Is.EqualTo(0.5));
+            Assert.That(ball.VelocityX, Is.EqualTo(1));
+            Assert.That(ball.VelocityY, Is.EqualTo(2));
         }
     }
 }
