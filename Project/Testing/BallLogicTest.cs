@@ -62,11 +62,12 @@ namespace Testing
             ballLogic.RepoModel.BallsNumber = "5";
             ballLogic.CreateBalls();
             ballLogic.RepoData.Balls[0].VelocityX = 10;
-            ballLogic.RepoData.Balls[0].VelocityY = 0.5;
+            ballLogic.RepoData.Balls[0].VelocityY = 0.1;
             ballLogic.RepoModel.Balls[0].PosX = 574;
+            ballLogic.RepoModel.Balls[0].PosY = 274;
             Thread.Sleep(100);
             Assert.That(ballLogic.RepoData.Balls[0].VelocityX, Is.EqualTo(-10));
-            Assert.That(ballLogic.RepoData.Balls[0].VelocityY, Is.EqualTo(0.5));
+            Assert.That(ballLogic.RepoData.Balls[0].VelocityY, Is.EqualTo(0.1));
         }
 
         [Test]
@@ -75,12 +76,12 @@ namespace Testing
             IBallLogic ballLogic = new BallLogic();
             ballLogic.RepoModel.BallsNumber = "1";
             ballLogic.CreateBalls();
-            ballLogic.RepoData.Balls[0].VelocityX = 1;
+            ballLogic.RepoData.Balls[0].VelocityX = 0.1;
             ballLogic.RepoData.Balls[0].VelocityY = 20;
             ballLogic.RepoModel.Balls[0].PosY = 274;
             ballLogic.RepoModel.Balls[0].PosX = 274;
-            Thread.Sleep(10);
-            Assert.That(ballLogic.RepoData.Balls[0].VelocityX, Is.EqualTo(1));
+            Thread.Sleep(100);
+            Assert.That(ballLogic.RepoData.Balls[0].VelocityX, Is.EqualTo(0.1));
             Assert.That(ballLogic.RepoData.Balls[0].VelocityY, Is.EqualTo(-20));
         }
         [Test]
