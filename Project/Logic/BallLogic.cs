@@ -3,13 +3,13 @@ using Data;
 using System;
 using System.Threading;
 using System.Collections.Generic;
-using System.Collections.Specialized;
+using System.Threading.Tasks;
 
 namespace Logic
 {
     public interface IBallLogic
     {
-        public void CreateBalls();
+        public Task CreateBalls();
         DataRepo RepoData { get; set; }
         ModelRepo RepoModel { get; set; }
     }
@@ -19,144 +19,111 @@ namespace Logic
         private double _maxWidth = 582;
         private double _maxHeight = 282;
         private readonly Random _random = new Random();
-        private Timer _timer;
         private ModelRepo _repoModel = new ModelRepo();
         private DataRepo _repoData = new DataRepo();
+        private List<Task> _tasks = new List<Task>();
+        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(); 
        
         private void GenerateDirection(object obj1, object obj2)
         {
             BallModel ball = (BallModel)obj1;
             BallData ballData = (BallData)obj2;
-            double angle = _random.NextDouble() * Math.PI;
-            ballData.A = Math.Tan(angle);
-            ballData.B = ball.PosY - (ballData.A * ball.PosX);
             int rand = _random.Next(0, 2);
             int directionHorizontal = rand == 0 ? -1 : 1;
             int directionVertical = rand == 0 ? -1 : 1; 
-            //ballData.Weight = _random.Next(1, 4);
-            ballData.Weight = 1;
+            ballData.Weight = _random.Next(1, 4);
             ballData.VelocityX = (_random.NextDouble() + 2) * directionHorizontal;
             ballData.VelocityY = (_random.NextDouble() + 2) * directionVertical;
         }
-        /*
-        private void MoveBalls(object state)
+        
+
+        private async Task MoveBall(BallModel ball, BallData ballData, CancellationToken cancellationToken)
         {
-            int counter = 0;
-
-            var ballsCopy = new List<BallData>(RepoData.Balls);
-            var ballsModelCopy = new List<BallModel>(RepoModel.Balls);
-
-            foreach (BallData ball in ballsCopy)
-            {
-                double newX = ballsModelCopy[counter].PosX + ball.Direction * 4;
-                double newY = ball.A * newX + ball.B;
-
-                if (newX >= 0 && newX <= _maxWidth && newY >= 0 && newY <= _maxHeight)
-                {
-                    ballsModelCopy[counter].PosX = newX;
-                    ballsModelCopy[counter].PosY = newY;
-                }
-                else
-                {
-                    if (newX < 0 || newX > _maxWidth)
-                    {
-                        ball.Direction = -ball.Direction;
-                    }
-                    ball.A = -ball.A;
-                    ball.B = ballsModelCopy[counter].PosY - (ball.A * ballsModelCopy[counter].PosX);
-                }
-                
-                counter++;
-            }
-        }
-        */
-
-        private void MoveBall(object state1, object state2)
-        {
-            BallModel ball = (BallModel)state1;
-            BallData ballData = (BallData)state2;
-
-            var ballsCopy = new List<BallData>(RepoData.Balls);
-            var ballsModelCopy = new List<BallModel>(RepoModel.Balls);
-
-            while (true)
+            while (!cancellationToken.IsCancellationRequested)
             {
                 double newX, newY;
-
                 
-                    int counter = 0;
-                    foreach (var otherBall in ballsCopy)
+                await Task.Delay(10, cancellationToken);
+
+                lock (RepoData.Balls)
+                {
+                    lock (RepoModel.Balls)
                     {
-                        double distance = Math.Sqrt(Math.Pow((ballsModelCopy[counter].PosX - ball.PosX), 2)
-                            + Math.Pow((ballsModelCopy[counter].PosY - ball.PosY), 2));
-                        if (distance <= 20 && otherBall != ballData)
+                        lock (ballData)
                         {
-                            double tempX = ballData.VelocityX;
-                            double tempY = ballData.VelocityY;
-                            ballData.VelocityX = otherBall.VelocityX;
-                            ballData.VelocityY = otherBall.VelocityY;
+                            int counter = 0;
+                            foreach (var otherBall in RepoData.Balls)
+                            {
+                                double distance = Math.Sqrt(Math.Pow((RepoModel.Balls[counter].PosX - ball.PosX), 2)
+                                                           + Math.Pow((RepoModel.Balls[counter].PosY - ball.PosY), 2));
+                                if (distance < 21 && otherBall != ballData)
+                                {
+                                    double tempX = (ballData.VelocityX * (ballData.Weight - otherBall.Weight)
+                                                    + 2 * otherBall.Weight * otherBall.VelocityX) /
+                                                   (ballData.Weight + otherBall.Weight);
+                                    double tempY = (ballData.VelocityY * (ballData.Weight - otherBall.Weight)
+                                                    + 2 * otherBall.Weight * otherBall.VelocityY) /
+                                                   (ballData.Weight + otherBall.Weight);
 
-                            otherBall.VelocityX = tempX;
-                            otherBall.VelocityY = tempY;
+                                    otherBall.VelocityX = (otherBall.VelocityX * (otherBall.Weight - ballData.Weight)
+                                                           + 2 * ballData.Weight * ballData.VelocityX) /
+                                                          (ballData.Weight + otherBall.Weight);
+                                    otherBall.VelocityY = (otherBall.VelocityY * (otherBall.Weight - ballData.Weight)
+                                                           + 2 * ballData.Weight * ballData.VelocityY) /
+                                                          (ballData.Weight + otherBall.Weight);
 
-                            //ballData.VelocityX = (ballData.VelocityX * (ballData.Weight - otherBall.Weight)
-                            // + 2 * otherBall.Weight * otherBall.VelocityX) / (ballData.Weight + otherBall.Weight);
+                                    ballData.VelocityX = tempX;
+                                    ballData.VelocityY = tempY;
+                                    if (distance < 20)
+                                    {
+                                        newX = ball.PosX + ballData.VelocityX * 2;
+                                        newY = ball.PosY + ballData.VelocityY * 2;
+                                        if (newX >= 10 && newX <= _maxWidth && newY >= 10 && newY <= _maxHeight)
+                                        {
+                                            ball.PosX = newX;
+                                            ball.PosY = newY;
+                                        }
+                                    }
+                                }
 
-                            //ballData.VelocityY = (ballData.VelocityY * (ballData.Weight - otherBall.Weight)
-                            // + 2 * otherBall.Weight * otherBall.VelocityY) / (ballData.Weight + otherBall.Weight);
+                                counter++;
 
-                            //ballData.A = otherBall.A;
-                            //otherBall.A = a;
+                            }
 
-
-
-                            //otherBall.VelocityX = (otherBall.VelocityX * (otherBall.Weight - ballData.Weight)
-                            //+ 2 * ballData.Weight * ballData.VelocityX) / (ballData.Weight + otherBall.Weight);
-                            //otherBall.VelocityY = (otherBall.VelocityY * (otherBall.Weight - ballData.Weight)
-                            // + 2 * ballData.Weight * ballData.VelocityY) / (ballData.Weight + otherBall.Weight);
-
+                            newX = ball.PosX + ballData.VelocityX;
+                            newY = ball.PosY + ballData.VelocityY;
+                            if (newX >= 10 && newX <= _maxWidth && newY >= 10 && newY <= _maxHeight)
+                            {
+                                ball.PosX = newX;
+                                ball.PosY = newY;
+                            }
+                            else
+                            {
+                                ballData.VelocityY = -ballData.VelocityY;
+                                if (newX < 10 || newX > _maxWidth)
+                                {
+                                    ballData.VelocityX = -ballData.VelocityX;
+                                    ballData.VelocityY = -ballData.VelocityY;
+                                }
+                            }
                         }
-                        counter++;
-
                     }
-
-                    newX = ball.PosX + ballData.VelocityX;
-                    newY = ball.PosY + ballData.VelocityY;
-
-                    if (newX >= 10 && newX <= _maxWidth && newY >= 10 && newY <= _maxHeight)
-                    {
-                        ball.PosX = newX;
-                        ball.PosY = newY;
-                    }
-                    else
-                    {
-                        ballData.VelocityY = -ballData.VelocityY;
-                        if (newX < 10 || newX > _maxWidth)
-                        {
-                            ballData.VelocityX = -ballData.VelocityX;
-                            ballData.VelocityY = -ballData.VelocityY;
-                        }
-                        ballData.B = ball.PosY - (ballData.A * ball.PosX);
-                    }
-                
-                Thread.Sleep(10);
+                }
             }
         }
            
-        public void CreateBalls()
+        public async Task CreateBalls()
         {
-            // Nw czy po kolejnym wywołaniu tej funkcji poprzednie wątki się kończą
-            /*
-            if (_timer != null)
-            {
-                _timer.Dispose();
-            }
-            */
-
             RepoData.Balls.Clear();
             RepoModel.Balls.Clear();
             
+            _cancellationTokenSource.Cancel();
+
             int ballsNumber = Convert.ToInt32(RepoModel.BallsNumber);
+
+            _cancellationTokenSource = new CancellationTokenSource();
+
+            _tasks.Clear();
 
             for (int i = 0; i < ballsNumber; i++)
             {
@@ -167,12 +134,12 @@ namespace Logic
                 RepoModel.Balls.Add(ball);
                 RepoData.Balls.Add(ballData);
                 GenerateDirection(ball, ballData);
-                Thread thread = new Thread(() => MoveBall(ball, ballData)); 
-                thread.IsBackground = true;
-                thread.Start();
+                Task task = MoveBall(ball, ballData, _cancellationTokenSource.Token);
+                _tasks.Add(task);
             }
+
+            Console.WriteLine(_tasks.Count);
         }
-        
         
         public ModelRepo RepoModel
         {
