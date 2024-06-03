@@ -31,6 +31,8 @@ namespace Model
                 OnPropertyChanged();
             }
         }
+        
+        
 
         public event PropertyChangedEventHandler PropertyChanged;
 

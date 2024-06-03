@@ -4,6 +4,9 @@ using System;
 using System.Threading;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Text.Json;
+using System.IO;
+using System.Linq;
 
 namespace Logic
 {
@@ -22,7 +25,8 @@ namespace Logic
         private ModelRepo _repoModel = new ModelRepo();
         private DataRepo _repoData = new DataRepo();
         private List<Task> _tasks = new List<Task>();
-        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(); 
+        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        private string _logFilePath = "..\\..\\..\\..\\log.json";
        
         private void GenerateDirection(object obj1, object obj2)
         {
@@ -116,6 +120,7 @@ namespace Logic
         {
             RepoData.Balls.Clear();
             RepoModel.Balls.Clear();
+            ClearLog();
             
             _cancellationTokenSource.Cancel();
 
@@ -138,7 +143,94 @@ namespace Logic
                 _tasks.Add(task);
             }
 
+            Task.Run(async () => await LogBallData(_cancellationTokenSource.Token));
             Console.WriteLine(_tasks.Count);
+        }
+        
+        public void ClearLog()
+        {
+            try
+            {
+                File.WriteAllText(_logFilePath, string.Empty);
+            }
+            catch (Exception ex)
+            {
+                // Wypisz wyjątek na konsoli
+                Console.WriteLine($"An error occurred while clearing the log file: {ex.Message}");
+            }
+        }
+        
+        private async Task LogBallData(CancellationToken cancellationToken)
+        {
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true // To enable pretty print with indents and new lines
+            };
+
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                try
+                {
+                    string jsonString;
+                    lock (_repoData)
+                    {
+                        lock (_repoModel)
+                        {
+                            var logData = new
+                            {
+                                Timestamp = DateTime.Now,
+                                Balls = _repoData.Balls.Select(b => new
+                                {
+                                    b.VelocityX,
+                                    b.VelocityY,
+                                    b.Weight
+
+                                }).ToList()
+                            };
+
+                            var logModel = new
+                            {
+                                Balls = _repoModel.Balls.Select(m => new
+                                {
+                                    m.PosX,
+                                    m.PosY
+                                }).ToList()
+                            };
+
+                            var combinedLogData = new
+                            {
+                                logData.Timestamp,
+                                Balls = logData.Balls.Zip(logModel.Balls, (b, m) => new
+                                {
+                                    b.VelocityX,
+                                    b.VelocityY,
+                                    b.Weight,
+                                    m.PosX,
+                                    m.PosY
+                                }).ToList()
+                            };
+
+                            jsonString = JsonSerializer.Serialize(combinedLogData, options);
+
+                            // Dodaj nową linię przed zapisaniem nowego wpisu logu
+                            jsonString += Environment.NewLine;
+
+                            // Append the JSON string to the log file
+
+                        }
+                    }
+
+                    await File.AppendAllTextAsync(_logFilePath, jsonString + Environment.NewLine,
+                        cancellationToken);
+                }
+                catch (Exception ex)
+                {
+                    // Wypisz wyjątek na konsoli
+                    Console.WriteLine($"An error occurred while writing to the log file: {ex.Message}");
+                }
+
+                await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
+            }
         }
         
         public ModelRepo RepoModel
