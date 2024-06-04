@@ -143,7 +143,7 @@ namespace Logic
                 _tasks.Add(task);
             }
 
-            Task.Run(async () => await LogBallData(_cancellationTokenSource.Token));
+            Task.Run(async () => await MakeLogs(_cancellationTokenSource.Token));
             Console.WriteLine(_tasks.Count);
         }
         
@@ -155,27 +155,35 @@ namespace Logic
             }
             catch (Exception ex)
             {
-                // Wypisz wyjątek na konsoli
-                Console.WriteLine($"An error occurred while clearing the log file: {ex.Message}");
+                Console.WriteLine($"Bład podczas czyszczenia: {ex.Message}");
             }
         }
         
-        private async Task LogBallData(CancellationToken cancellationToken)
+        private async Task MakeLogs(CancellationToken cancellationToken)
         {
             var options = new JsonSerializerOptions
             {
-                WriteIndented = true // To enable pretty print with indents and new lines
+                WriteIndented = true
             };
 
             while (!cancellationToken.IsCancellationRequested)
             {
                 try
                 {
-                    string jsonString;
+                    string data;
                     lock (_repoData)
                     {
                         lock (_repoModel)
                         {
+                            var logModel = new
+                            {
+                                Balls = _repoModel.Balls.Select(m => new
+                                {
+                                    m.PosX,
+                                    m.PosY
+                                }).ToList()
+                            };
+                            
                             var logData = new
                             {
                                 Timestamp = DateTime.Now,
@@ -185,15 +193,6 @@ namespace Logic
                                     b.VelocityY,
                                     b.Weight
 
-                                }).ToList()
-                            };
-
-                            var logModel = new
-                            {
-                                Balls = _repoModel.Balls.Select(m => new
-                                {
-                                    m.PosX,
-                                    m.PosY
                                 }).ToList()
                             };
 
@@ -210,23 +209,18 @@ namespace Logic
                                 }).ToList()
                             };
 
-                            jsonString = JsonSerializer.Serialize(combinedLogData, options);
-
-                            // Dodaj nową linię przed zapisaniem nowego wpisu logu
-                            jsonString += Environment.NewLine;
-
-                            // Append the JSON string to the log file
-
+                            data = JsonSerializer.Serialize(combinedLogData, options);
+                            
+                            data += Environment.NewLine;
                         }
                     }
 
-                    await File.AppendAllTextAsync(_logFilePath, jsonString + Environment.NewLine,
+                    await File.AppendAllTextAsync(_logFilePath, data + Environment.NewLine,
                         cancellationToken);
                 }
                 catch (Exception ex)
                 {
-                    // Wypisz wyjątek na konsoli
-                    Console.WriteLine($"An error occurred while writing to the log file: {ex.Message}");
+                    Console.WriteLine($"Błąd podczas zapisu: {ex.Message}");
                 }
 
                 await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
