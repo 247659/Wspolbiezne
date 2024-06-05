@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Text.Json;
 using System.IO;
 using System.Linq;
+using System.Timers;
 
 namespace Logic
 {
@@ -26,7 +27,8 @@ namespace Logic
         private DataRepo _repoData = new DataRepo();
         private List<Task> _tasks = new List<Task>();
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
-        private string _logFilePath = "..\\..\\..\\..\\log.json";
+        private System.Timers.Timer aTimer;
+        FileStream filestream;
        
         private void GenerateDirection(object obj1, object obj2)
         {
@@ -120,7 +122,6 @@ namespace Logic
         {
             RepoData.Balls.Clear();
             RepoModel.Balls.Clear();
-            ClearLog();
             
             _cancellationTokenSource.Cancel();
 
@@ -142,88 +143,43 @@ namespace Logic
                 Task task = MoveBall(ball, ballData, _cancellationTokenSource.Token);
                 _tasks.Add(task);
             }
-
-            Task.Run(async () => await MakeLogs(_cancellationTokenSource.Token));
+            
+            Task timer = new Task(() => {startLogging(); });
+            timer.Start();
             Console.WriteLine(_tasks.Count);
         }
         
-        public void ClearLog()
+        public void startLogging()
         {
+            string path = "..\\..\\..\\..\\Logs";
+
             try
             {
-                File.WriteAllText(_logFilePath, string.Empty);
+                if (Directory.Exists(path))
+                {
+                    string fileName = "..\\..\\..\\..\\Logs\\log.json";
+                    filestream = File.Create(fileName);
+                }
+                else
+                {
+                    Directory.CreateDirectory(path);
+                    string fileName = "..\\..\\..\\..\\Logs\\log.json";
+                    filestream = File.Create(fileName);
+                }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Bład podczas czyszczenia: {ex.Message}");
-            }
+            catch (Exception ex) { Console.WriteLine($"Error: {ex.Message}"); }
+
+            aTimer = new System.Timers.Timer();
+            aTimer.Elapsed += new ElapsedEventHandler(SaveLog);
+            
+            aTimer.Interval = 1000; 
+            aTimer.Start();
         }
-        
-        private async Task MakeLogs(CancellationToken cancellationToken)
+        public void SaveLog(object data, ElapsedEventArgs e)
         {
-            var options = new JsonSerializerOptions
+            foreach (BallData b in _repoData.Balls)
             {
-                WriteIndented = true
-            };
-
-            while (!cancellationToken.IsCancellationRequested)
-            {
-                try
-                {
-                    string data;
-                    lock (_repoData)
-                    {
-                        lock (_repoModel)
-                        {
-                            var logModel = new
-                            {
-                                Balls = _repoModel.Balls.Select(m => new
-                                {
-                                    m.PosX,
-                                    m.PosY
-                                }).ToList()
-                            };
-                            
-                            var logData = new
-                            {
-                                Timestamp = DateTime.Now,
-                                Balls = _repoData.Balls.Select(b => new
-                                {
-                                    b.VelocityX,
-                                    b.VelocityY,
-                                    b.Weight
-
-                                }).ToList()
-                            };
-
-                            var combinedLogData = new
-                            {
-                                logData.Timestamp,
-                                Balls = logData.Balls.Zip(logModel.Balls, (b, m) => new
-                                {
-                                    b.VelocityX,
-                                    b.VelocityY,
-                                    b.Weight,
-                                    m.PosX,
-                                    m.PosY
-                                }).ToList()
-                            };
-
-                            data = JsonSerializer.Serialize(combinedLogData, options);
-                            
-                            data += Environment.NewLine;
-                        }
-                    }
-
-                    await File.AppendAllTextAsync(_logFilePath, data + Environment.NewLine,
-                        cancellationToken);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Błąd podczas zapisu: {ex.Message}");
-                }
-
-                await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
+                JsonSerializer.SerializeAsync(filestream, b);
             }
         }
         
